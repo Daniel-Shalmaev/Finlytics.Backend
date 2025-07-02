@@ -1,4 +1,5 @@
-﻿using Finlytics.Application.Interfaces;
+﻿using Finlytics.Application.DTOs;
+using Finlytics.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finlytics.Presentation.Controllers;
@@ -23,5 +24,12 @@ public class FinanceController : ControllerBase
             return BadRequest(new { error = "Invalid date range: 'to' cannot be in the future." });
 
         return Ok(await _financeService.GetFinanceData(from, to));
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<DailyFinanceDto>> Add([FromBody] AddDailyFinanceDto dto)
+    {
+        var result = await _financeService.AddAsync(dto);
+        return Ok(result);
     }
 }

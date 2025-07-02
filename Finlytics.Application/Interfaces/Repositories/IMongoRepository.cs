@@ -1,7 +1,6 @@
-﻿using MongoDB.Driver;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace Finlytics.Infrastructure.Repositories;
+namespace Finlytics.Application.Interfaces.Repositories;
 
 public interface IMongoRepository<T>
 {
@@ -10,5 +9,5 @@ public interface IMongoRepository<T>
     Task AddAsync(T entity);
     Task UpdateAsync(T entity);
     Task DeleteAsync(string id);
-    Task<List<T>> FilterByMongoFilterAsync(FilterDefinition<T> filter);
+    Task<List<T>> FilterByAsync(Expression<Func<T, bool>> filter);
 }

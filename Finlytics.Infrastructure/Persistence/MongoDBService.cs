@@ -10,9 +10,14 @@ public class MongoDbService
 
     public MongoDbService(IConfiguration config)
     {
-        _client = new MongoClient(config["MongoDBSettings:ConnectionString"]);
-        _database = _client.GetDatabase(config["MongoDBSettings:DatabaseName"]);
+        var connectionString = config["MongoDBSettings:ConnectionString"];
+        var dbName = config["MongoDBSettings:DatabaseName"];
+
+        _client = new MongoClient(connectionString);
+        _database = _client.GetDatabase(dbName);
     }
+
+    public IMongoDatabase GetDatabase() => _database;
 
     // Returns a collection of the specified type
     public IMongoCollection<T> GetCollection<T>(string collectionName) =>

@@ -1,28 +1,59 @@
 ﻿using MongoDB.Driver;
-using Finlytics.Domain.Models;
+using Finlytics.Application.DTOs;
 using Finlytics.Application.Interfaces;
-using Finlytics.Infrastructure.Persistence;
+using Finlytics.Application.Mappings;
+using Finlytics.Infrastructure.MongoModels;
 using Finlytics.Infrastructure.Repositories;
 
 namespace Finlytics.Infrastructure.Services;
 
-public class FinanceService : MongoRepository<DailyFinance>, IFinanceService
+public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) : IFinanceService
 {
-    public FinanceService(MongoDbService mongoDbService) : base(mongoDbService, "Finance") { }
+    private readonly IMongoRepository<DailyFinanceDocument> _repository = repository;
 
-    // Retrieves financial data within the specified date range.
-    public async Task<List<DailyFinance>> GetFinanceData(DateTime? from = null, DateTime? to = null)
+    public async Task<List<DailyFinanceDto>> GetAllAsync()
     {
-        // Set default date range if not provided
+        var documents = await _repository.GetAllAsync();
+        return documents.Select(d => d.ToEntity().ToDto()).ToList();
+    }
+
+    public async Task<DailyFinanceDto> AddAsync(AddDailyFinanceDto dto)
+    {
+        var entity = dto.ToEntity();
+        var doc = entity.ToDocument();
+        await _repository.AddAsync(doc);
+        return entity.ToDto();
+    }
+
+    public async Task<List<DailyFinanceDto>> GetFinanceData(DateTime? from, DateTime? to)
+    {
         from ??= new DateTime(2021, 6, 1, 0, 0, 0, DateTimeKind.Utc);
         to ??= new DateTime(2021, 12, 31, 23, 59, 59, DateTimeKind.Utc);
 
-        // Create a filter to query financial data based on date range
-        var filter = Builders<DailyFinance>.Filter.And(
-            Builders<DailyFinance>.Filter.Gte("date", from.Value.ToString("yyyy-MM-ddTHH:mm:ss")),
-            Builders<DailyFinance>.Filter.Lte("date", to.Value.ToString("yyyy-MM-ddTHH:mm:ss"))
+        var fromString = from.Value.ToString("yyyy-MM-ddTHH:mm:ss");
+        var toString = to.Value.ToString("yyyy-MM-ddTHH:mm:ss");
+
+        // Converts query range to ISO string filters for Mongo
+        var filter = Builders<DailyFinanceDocument>.Filter.And(
+            Builders<DailyFinanceDocument>.Filter.Gte("date", fromString),
+            Builders<DailyFinanceDocument>.Filter.Lte("date", toString)
         );
 
-        return await FindByFilter(filter);
+        var documents = await _repository.FilterByMongoFilterAsync(filter);
+
+        return documents.Select(d => d.ToEntity().ToDto()).ToList();
+    }
+
+    public async Task<DailyFinanceDto> UpdateAsync(UpdateDailyFinanceDto dto)
+    {
+        var entity = dto.ToEntity();
+        var doc = entity.ToDocument();
+        await _repository.UpdateAsync(doc);
+        return entity.ToDto();
+    }
+
+    public async Task DeleteAsync(string id)
+    {
+        await _repository.DeleteAsync(id);
     }
 }
