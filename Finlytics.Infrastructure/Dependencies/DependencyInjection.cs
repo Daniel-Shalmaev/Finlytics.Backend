@@ -22,6 +22,8 @@ public static class DependencyInjection
 
         services.AddSingleton(typeof(IMongoRepository<>), typeof(MongoRepository<>));
         services.AddScoped<IFinanceService, FinanceService>();
+        //services.AddScoped<ICompanyService, CompanyService>();
+
 
         return services;
 

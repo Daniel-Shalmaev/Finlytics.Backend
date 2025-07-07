@@ -14,7 +14,7 @@ public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) :
     public async Task<List<DailyFinanceDto>> GetAllAsync()
     {
         var documents = await _repository.GetAllAsync();
-        return documents.Select(d => d.ToEntity().ToDto()).ToList();
+        return [.. documents.Select(d => d.ToEntity().ToDto())];
     }
 
     public async Task<DailyFinanceDto> AddAsync(AddDailyFinanceDto dto)
@@ -41,7 +41,7 @@ public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) :
 
         var documents = await _repository.FilterByMongoFilterAsync(filter);
 
-        return documents.Select(d => d.ToEntity().ToDto()).ToList();
+        return [.. documents.Select(d => d.ToEntity().ToDto())];
     }
 
     public async Task<DailyFinanceDto> UpdateAsync(UpdateDailyFinanceDto dto)
@@ -52,8 +52,5 @@ public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) :
         return entity.ToDto();
     }
 
-    public async Task DeleteAsync(string id)
-    {
-        await _repository.DeleteAsync(id);
-    }
+    public async Task DeleteAsync(string id) => await _repository.DeleteAsync(id);
 }

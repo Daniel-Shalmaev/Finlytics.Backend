@@ -4,14 +4,16 @@ using System.Linq.Expressions;
 
 namespace Finlytics.Infrastructure.Repositories;
 
-public class MongoRepository<T>(IMongoDatabase database) : IMongoRepository<T> where T : IIdentifiable
+public class MongoRepository<T> : IMongoRepository<T> where T : IIdentifiable
 {
-    private readonly IMongoCollection<T> _collection = database.GetCollection<T>("Finance");
+    private readonly IMongoCollection<T> _collection;
 
-    public async Task<List<T>> GetAllAsync()
+    public MongoRepository(IMongoDatabase database)
     {
-        return await _collection.Find(_ => true).ToListAsync();
+        _collection = database.GetCollection<T>("Finance");
     }
+
+    public async Task<List<T>> GetAllAsync() => await _collection.Find(_ => true).ToListAsync();
 
     public async Task<T> GetByIdAsync(string id)
     {
@@ -19,10 +21,7 @@ public class MongoRepository<T>(IMongoDatabase database) : IMongoRepository<T> w
         return await _collection.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task AddAsync(T entity)
-    {
-        await _collection.InsertOneAsync(entity);
-    }
+    public async Task AddAsync(T entity) => await _collection.InsertOneAsync(entity);
 
     public async Task UpdateAsync(T entity)
     {
@@ -37,9 +36,6 @@ public class MongoRepository<T>(IMongoDatabase database) : IMongoRepository<T> w
         await _collection.DeleteOneAsync(filter);
     }
 
-    public async Task<List<T>> FilterByMongoFilterAsync(FilterDefinition<T> filter)
-    {
-        return await _collection.Find(filter).ToListAsync();
-    }
+    public async Task<List<T>> FilterByMongoFilterAsync(FilterDefinition<T> filter) => await _collection.Find(filter).ToListAsync();
 
 }

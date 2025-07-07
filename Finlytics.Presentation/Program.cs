@@ -2,6 +2,11 @@ using Finlytics.Infrastructure.Dependencies;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ListenAnyIP(8080);
+//});
+
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddCors(options =>
@@ -14,8 +19,6 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
-
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
