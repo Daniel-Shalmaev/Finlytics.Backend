@@ -1,11 +1,14 @@
-﻿using MongoDB.Driver;
-using Finlytics.Application.DTOs;
+﻿using Finlytics.Application.DTOs;
 using Finlytics.Application.Interfaces;
+using Finlytics.Application.Interfaces.Repositories;
 using Finlytics.Application.Mappings;
 using Finlytics.Infrastructure.MongoModels;
 using Finlytics.Infrastructure.Repositories;
+using MongoDB.Driver;
+
 
 namespace Finlytics.Infrastructure.Services;
+
 
 public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) : IFinanceService
 {
@@ -39,7 +42,11 @@ public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) :
             Builders<DailyFinanceDocument>.Filter.Lte("date", toString)
         );
 
-        var documents = await _repository.FilterByMongoFilterAsync(filter);
+        var concreteRepo = _repository as MongoRepository<DailyFinanceDocument>;
+        if (concreteRepo == null)
+            throw new InvalidCastException("MongoRepository expected");
+
+        var documents = await concreteRepo.FilterByMongoFilterAsync(filter);
 
         return [.. documents.Select(d => d.ToEntity().ToDto())];
     }

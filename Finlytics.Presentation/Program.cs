@@ -2,6 +2,8 @@ using Finlytics.Infrastructure.Dependencies;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
 //builder.WebHost.ConfigureKestrel(options =>
 //{
 //    options.ListenAnyIP(8080);
@@ -36,6 +38,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAngular");
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

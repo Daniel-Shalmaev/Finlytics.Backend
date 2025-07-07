@@ -1,10 +1,12 @@
-﻿using Finlytics.Domain.Interfaces;
+﻿using Finlytics.Application.Interfaces.Repositories;
+using Finlytics.Domain.Interfaces;
+using Finlytics.Infrastructure.MongoRepositories;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
 namespace Finlytics.Infrastructure.Repositories;
 
-public class MongoRepository<T> : IMongoRepository<T> where T : IIdentifiable
+public class MongoRepository<T> : IMongoRepository<T>, IMongoRawFilter<T> where T : IIdentifiable
 {
     private readonly IMongoCollection<T> _collection;
 
@@ -29,6 +31,10 @@ public class MongoRepository<T> : IMongoRepository<T> where T : IIdentifiable
         await _collection.ReplaceOneAsync(filter, entity);
     }
 
+    public async Task<List<T>> FilterByAsync(Expression<Func<T, bool>> filter)
+    {
+        return await _collection.Find(filter).ToListAsync();
+    }
 
     public async Task DeleteAsync(string id)
     {
