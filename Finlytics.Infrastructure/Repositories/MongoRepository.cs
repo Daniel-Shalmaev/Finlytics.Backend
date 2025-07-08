@@ -1,5 +1,7 @@
 ﻿using Finlytics.Application.Interfaces.Repositories;
+using Finlytics.Domain.Entities;
 using Finlytics.Domain.Interfaces;
+using Finlytics.Infrastructure.MongoModels;
 using Finlytics.Infrastructure.MongoRepositories;
 using MongoDB.Driver;
 using System.Linq.Expressions;
@@ -12,7 +14,11 @@ public class MongoRepository<T> : IMongoRepository<T>, IMongoRawFilter<T> where 
 
     public MongoRepository(IMongoDatabase database)
     {
-        _collection = database.GetCollection<T>("Finance");
+        var type = typeof(T);
+        if (!CollectionMapping.Names.TryGetValue(type, out var collectionName))
+            collectionName = type.Name;
+
+        _collection = database.GetCollection<T>(collectionName);
     }
 
     public async Task<List<T>> GetAllAsync() => await _collection.Find(_ => true).ToListAsync();

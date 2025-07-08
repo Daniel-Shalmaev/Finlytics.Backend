@@ -23,8 +23,8 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserDto dto)
     {
-        var userId = await _userService.LoginAsync(dto);
-        return Ok(new { UserId = userId });
+        var token = await _userService.LoginAsync(dto);
+        return Ok(new { token });
     }
 
     [Authorize]
@@ -35,6 +35,4 @@ public class UserController(IUserService userService) : ControllerBase
         var profile = await _userService.GetProfileAsync(userId);
         return Ok(profile);
     }
-
-
 }
