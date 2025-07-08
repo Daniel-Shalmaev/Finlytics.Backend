@@ -3,6 +3,7 @@ using Finlytics.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Finlytics.Presentation.Controllers;
 
@@ -27,11 +28,13 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("profile/{id}")]
-    public async Task<IActionResult> GetProfile(string id)
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
     {
-        var profile = await _userService.GetProfileAsync(id);
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var profile = await _userService.GetProfileAsync(userId);
         return Ok(profile);
     }
+
 
 }
