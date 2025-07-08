@@ -1,5 +1,5 @@
-﻿using Finlytics.Domain.Interfaces;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
+using Finlytics.Domain.Interfaces;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Finlytics.Infrastructure.MongoModels;

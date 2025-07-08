@@ -6,12 +6,9 @@ namespace Finlytics.Presentation.Controllers;
 
 [Route("api/finance")]
 [ApiController]
-public class FinanceController : ControllerBase
+public class FinanceController(IFinanceService financeService) : ControllerBase
 {
-    private readonly IFinanceService _financeService;
-
-    public FinanceController(IFinanceService financeService) =>
-        _financeService = financeService;
+    private readonly IFinanceService _financeService = financeService;
 
     // Endpoint to retrieve financial data based on a date range
     [HttpGet("get-data")]

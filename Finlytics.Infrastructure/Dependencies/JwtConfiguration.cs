@@ -11,9 +11,11 @@ public static class JwtConfiguration
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
+        // Load JWT settings from configuration (appsettings.json)
         services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
         var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
 
+        // Configure authentication scheme to use JWT bearer tokens
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -21,15 +23,18 @@ public static class JwtConfiguration
         })
         .AddJwtBearer(options =>
         {
+            // Define how JWT tokens should be validated
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
+                ValidateIssuer = true,                         // Validate token issuer
+                ValidateAudience = true,                       // Validate token audience
+                ValidateLifetime = true,                       // Validate expiration
+                ValidateIssuerSigningKey = true,               // Validate the signature key
+                ValidIssuer = jwtSettings.Issuer,              // Expected issuer
+                ValidAudience = jwtSettings.Audience,          // Expected audience
+                IssuerSigningKey = new SymmetricSecurityKey(   // Signing key from config
+                    Encoding.UTF8.GetBytes(jwtSettings.Key)
+                )
             };
         });
 

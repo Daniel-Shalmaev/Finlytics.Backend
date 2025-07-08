@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+using Microsoft.Extensions.Configuration;
 
 namespace Finlytics.Infrastructure.Persistence;
 

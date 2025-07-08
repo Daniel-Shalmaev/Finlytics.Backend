@@ -2,9 +2,10 @@
 
 namespace Finlytics.Infrastructure.MongoModels;
 
+// Handles mapping between MongoDB documents and domain entities.
 public static class MongoMappings
 {
-    // Document ↔ Entity
+    // Converts DailyFinanceDocument → DailyFinance (domain model)
     public static DailyFinance ToEntity(this DailyFinanceDocument doc)
     {
         return new DailyFinance
@@ -16,6 +17,7 @@ public static class MongoMappings
         };
     }
 
+    // Converts DailyFinance → DailyFinanceDocument (Mongo document)
     public static DailyFinanceDocument ToDocument(this DailyFinance entity)
     {
         return new DailyFinanceDocument

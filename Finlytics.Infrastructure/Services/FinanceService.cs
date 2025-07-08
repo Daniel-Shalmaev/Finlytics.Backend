@@ -1,25 +1,21 @@
-﻿using Finlytics.Application.DTOs;
-using Finlytics.Application.Interfaces;
-using Finlytics.Application.Interfaces.Repositories;
+﻿using MongoDB.Driver;
+using Finlytics.Application.DTOs;
 using Finlytics.Application.Mappings;
+using Finlytics.Application.Interfaces;
 using Finlytics.Infrastructure.MongoModels;
-using Finlytics.Infrastructure.Repositories;
-using MongoDB.Driver;
-
+using Finlytics.Application.Interfaces.Repositories;
+using Finlytics.Infrastructure.Repositories.MongoRepositories;
 
 namespace Finlytics.Infrastructure.Services;
 
-
+// Service that manages financial records using MongoDB
 public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) : IFinanceService
 {
     private readonly IMongoRepository<DailyFinanceDocument> _repository = repository;
 
-    public async Task<List<DailyFinanceDto>> GetAllAsync()
-    {
-        var documents = await _repository.GetAllAsync();
-        return [.. documents.Select(d => d.ToEntity().ToDto())];
-    }
+    #region Add
 
+    // Adds a new finance entry and returns it as DTO
     public async Task<DailyFinanceDto> AddAsync(AddDailyFinanceDto dto)
     {
         var entity = dto.ToEntity();
@@ -28,6 +24,42 @@ public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) :
         return entity.ToDto();
     }
 
+    #endregion
+
+    #region Update
+
+    // Updates an existing finance record
+    public async Task<DailyFinanceDto> UpdateAsync(UpdateDailyFinanceDto dto)
+    {
+        var entity = dto.ToEntity();
+        var doc = entity.ToDocument();
+        await _repository.UpdateAsync(doc);
+        return entity.ToDto();
+    }
+
+    #endregion
+
+    #region Delete
+
+    // Deletes a finance record by ID
+    public async Task DeleteAsync(string id) =>
+        await _repository.DeleteAsync(id);
+
+    #endregion
+
+    #region Get All
+
+    public async Task<List<DailyFinanceDto>> GetAllAsync()
+    {
+        var documents = await _repository.GetAllAsync();
+        return [.. documents.Select(d => d.ToEntity().ToDto())];
+    }
+
+    #endregion
+
+    #region Get by Date Range
+
+    // Retrieves finance entries between two dates using raw Mongo filter
     public async Task<List<DailyFinanceDto>> GetFinanceData(DateTime? from, DateTime? to)
     {
         from ??= new DateTime(2021, 6, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -36,7 +68,6 @@ public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) :
         var fromString = from.Value.ToString("yyyy-MM-ddTHH:mm:ss");
         var toString = to.Value.ToString("yyyy-MM-ddTHH:mm:ss");
 
-        // Converts query range to ISO string filters for Mongo
         var filter = Builders<DailyFinanceDocument>.Filter.And(
             Builders<DailyFinanceDocument>.Filter.Gte("date", fromString),
             Builders<DailyFinanceDocument>.Filter.Lte("date", toString)
@@ -51,13 +82,5 @@ public class FinanceService(IMongoRepository<DailyFinanceDocument> repository) :
         return [.. documents.Select(d => d.ToEntity().ToDto())];
     }
 
-    public async Task<DailyFinanceDto> UpdateAsync(UpdateDailyFinanceDto dto)
-    {
-        var entity = dto.ToEntity();
-        var doc = entity.ToDocument();
-        await _repository.UpdateAsync(doc);
-        return entity.ToDto();
-    }
-
-    public async Task DeleteAsync(string id) => await _repository.DeleteAsync(id);
+    #endregion
 }

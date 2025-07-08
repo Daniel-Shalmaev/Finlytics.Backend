@@ -1,11 +1,10 @@
-﻿using Finlytics.Application.DTOs;
-using Finlytics.Domain.Entities;
+﻿using Finlytics.Domain.Entities;
+using Finlytics.Application.DTOs;
 
 namespace Finlytics.Application.Mappings;
 
 public static class DtoMappings
 {
-
     // Entity ↔ DTO
     public static DailyFinanceDto ToDto(this DailyFinance entity)
     {
@@ -53,5 +52,4 @@ public static class DtoMappings
             Outcome = dto.Type == "Outcome" ? dto.Amount : 0
         };
     }
-
 }
