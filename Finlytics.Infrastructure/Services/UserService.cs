@@ -67,6 +67,13 @@ public class UserService(IMongoRepository<User> repository, JwtService jwtServic
         };
     }
 
+    // Retrieves the user's first name by email, used for greeting after login
+    public async Task<string> GetFirstNameByEmailAsync(string email)
+    {
+        var user = (await _repository.FilterByAsync(u => u.Email == email)).FirstOrDefault();
+        return user?.FirstName ?? throw new Exception("User not found");
+    }
+
     #endregion
 
     #region Update Profile

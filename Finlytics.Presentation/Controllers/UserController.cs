@@ -1,8 +1,8 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
-using Finlytics.Application.DTOs;
+﻿using Finlytics.Application.DTOs;
 using Finlytics.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Finlytics.Presentation.Controllers;
 
@@ -21,12 +21,11 @@ public class UserController(IUserService userService) : ControllerBase
         var userId = await _userService.RegisterAsync(dto);
 
         var token = await _userService.LoginAsync(new LoginUserDto
-        {
-            Email = dto.Email,
-            Password = dto.Password
-        });
+        { Email = dto.Email, Password = dto.Password });
 
-        return Ok(new { token });
+        var firstName = await _userService.GetFirstNameByEmailAsync(dto.Email);
+
+        return Ok(new { token, firstName });
     }
 
     #endregion
@@ -38,7 +37,9 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<IActionResult> Login(LoginUserDto dto)
     {
         var token = await _userService.LoginAsync(dto);
-        return Ok(new { token });
+        var firstName = await _userService.GetFirstNameByEmailAsync(dto.Email);
+
+        return Ok(new { token, firstName });
     }
 
     #endregion
