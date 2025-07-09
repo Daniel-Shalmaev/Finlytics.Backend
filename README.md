@@ -46,3 +46,16 @@ It is built using ASP.NET Core and MongoDB, following a clean layered architectu
 - `Infrastructure` - MongoDB access, Services
 - `Presentation` - Controllers (API)
 - `Domain` - Entities
+
+## API Endpoints Overview
+
+| Method | Endpoint                | Description                          | Auth Required  |
+|--------|-------------------------|--------------------------------------|----------------|
+| GET    | /api/Company            | Get company data                     | ✅ Yes         |
+| POST   | /api/Company            | Create new company record            | ✅ Yes         |
+| GET    | /api/finance/get-data   | Retrieve finance data                | ✅ Yes         |
+| POST   | /api/finance            | Submit financial data                | ✅ Yes         |
+| POST   | /api/User/register      | Register a new user                  | ❌ No          |
+| POST   | /api/User/login         | Login with email and password        | ❌ No          |
+| GET    | /api/User/profile       | Get the authenticated user's profile | ✅ Yes         |
+| PUT    | /api/User/profile       | Update user's profile data           | ✅ Yes         |
